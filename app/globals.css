@@ -1,26 +1,275 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* =============================================
+   SHAZZAM CREATOR MEDIA KIT — NEO-CYBER KINETIC
+   Design System: Space Grotesk + Inter
+   Primary: #00FF66 | Secondary: #A855F7 | Tertiary: #38BDF8
+   ============================================= */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ---------- Surface Scale ---------- */
+  --color-surface-dim:                #131315;
+  --color-surface:                    #131315;
+  --color-surface-bright:             #39393b;
+  --color-surface-container-lowest:   #0e0e10;
+  --color-surface-container-low:      #1c1b1d;
+  --color-surface-container:          #201f21;
+  --color-surface-container-high:     #2a2a2c;
+  --color-surface-container-highest:  #353437;
+  --color-surface-variant:            #353437;
+  --color-surface-tint:               #00e55b;
+  --color-inverse-surface:            #e5e1e4;
+  --color-inverse-on-surface:         #313032;
+
+  /* ---------- Primary (Neon Lime) ---------- */
+  --color-primary:                    #edffe8;
+  --color-on-primary:                 #003911;
+  --color-primary-container:          #00ff66;
+  --color-on-primary-container:       #007128;
+  --color-inverse-primary:            #006e27;
+  --color-primary-fixed:              #6bff83;
+  --color-primary-fixed-dim:          #00e55b;
+  --color-on-primary-fixed:           #002107;
+  --color-on-primary-fixed-variant:   #00531b;
+
+  /* ---------- Secondary (Electric Purple) ---------- */
+  --color-secondary:                  #ddb7ff;
+  --color-on-secondary:               #490080;
+  --color-secondary-container:        #6f00be;
+  --color-on-secondary-container:     #d6a9ff;
+  --color-secondary-fixed:            #f0dbff;
+  --color-secondary-fixed-dim:        #ddb7ff;
+  --color-on-secondary-fixed:         #2c0051;
+  --color-on-secondary-fixed-variant: #6900b3;
+
+  /* ---------- Tertiary (Cyan Stream) ---------- */
+  --color-tertiary:                   #f6faff;
+  --color-on-tertiary:                #00354a;
+  --color-tertiary-container:         #b8e3ff;
+  --color-on-tertiary-container:      #00688e;
+  --color-tertiary-fixed:             #c4e7ff;
+  --color-tertiary-fixed-dim:         #7bd0ff;
+  --color-on-tertiary-fixed:          #001e2c;
+  --color-on-tertiary-fixed-variant:  #004c69;
+
+  /* ---------- Error ---------- */
+  --color-error:                      #ffb4ab;
+  --color-on-error:                   #690005;
+  --color-error-container:            #93000a;
+  --color-on-error-container:         #ffdad6;
+
+  /* ---------- On-Surface ---------- */
+  --color-on-surface:                 #e5e1e4;
+  --color-on-surface-variant:         #b9ccb5;
+  --color-on-background:              #e5e1e4;
+  --color-background:                 #131315;
+
+  /* ---------- Outline ---------- */
+  --color-outline:                    #849581;
+  --color-outline-variant:            #3b4b3a;
+
+  /* ---------- Typography ---------- */
+  --font-display-xl:    "Space Grotesk", sans-serif;
+  --font-headline-lg:   "Space Grotesk", sans-serif;
+  --font-headline-md:   "Space Grotesk", sans-serif;
+  --font-headline-sm:   "Space Grotesk", sans-serif;
+  --font-label-md:      "Space Grotesk", sans-serif;
+  --font-label-sm:      "Space Grotesk", sans-serif;
+  --font-body-lg:       "Inter", sans-serif;
+  --font-body-md:       "Inter", sans-serif;
+  --font-body-sm:       "Inter", sans-serif;
+
+  /* ---------- Spacing ---------- */
+  --spacing-margin:         3rem;
+  --spacing-margin-mobile:  1.25rem;
+  --spacing-gutter:         1.5rem;
+  --spacing-gutter-mobile:  1rem;
+  --spacing-space-xl:       2.5rem;
+  --spacing-space-lg:       1.5rem;
+  --spacing-space-md:       1rem;
+  --spacing-space-sm:       0.5rem;
+  --spacing-space-xs:       0.25rem;
+
+  /* ---------- Border Radius ---------- */
+  --radius-sm:   0.25rem;
+  --radius:      0.5rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1rem;
+  --radius-xl:   1.5rem;
+  --radius-full: 9999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-surface-container-lowest); }
+::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-outline); }
+
+/* ── Selection ── */
+::selection {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}
+
+/* ── Pucham Toggle Animations ── */
+@keyframes ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 102, 0.4); }
+  50%       { box-shadow: 0 0 40px rgba(0, 255, 102, 0.7), 0 0 60px rgba(0, 255, 102, 0.2); }
+}
+
+/* ── Utility Classes ── */
+.animate-ping {
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+.animate-fadeinup {
+  animation: fadeInUp 0.7s ease both;
+}
+.animate-fadein {
+  animation: fadeIn 0.5s ease both;
+}
+.animate-glow {
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+/* ── Glass Cards ── */
+.glass-card {
+  background: rgba(18, 18, 24, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-card-hover:hover {
+  background: rgba(24, 24, 32, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  box-shadow: 0 8px 32px -8px rgba(0, 255, 102, 0.15), 0 0 1px 1px rgba(0, 255, 102, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Neon Button ── */
+.btn-neon {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary);
+  font-weight: 700;
+  border-radius: var(--radius);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 0 20px rgba(0, 255, 102, 0.45);
+}
+.btn-neon:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 32px rgba(0, 255, 102, 0.65);
+}
+
+/* ── Ghost Button ── */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-on-surface);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+/* ── Form Inputs ── */
+.input-field {
+  background: rgba(10, 10, 12, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  color: var(--color-on-surface);
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
+  outline: none;
+}
+.input-field:focus {
+  border-color: var(--color-primary-container);
+  box-shadow: 0 0 0 3px rgba(0, 255, 102, 0.2);
+}
+.input-field::placeholder {
+  color: var(--color-outline);
+}
+
+/* ── Stat Counter Numbers ── */
+.stat-num {
+  font-family: "Space Grotesk", sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* ── Gradient Text ── */
+.gradient-text {
+  background: linear-gradient(90deg, #edffe8, #00ff66, #ddb7ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Ambient Backdrop ── */
+.ambient-glow-green {
+  background: radial-gradient(circle, rgba(0, 255, 102, 0.08) 0%, transparent 70%);
+}
+.ambient-glow-purple {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+}
+
+/* ── Media Tabs ── */
+.media-tab-active {
+  background: var(--color-surface-container-high);
+  color: var(--color-primary);
+}
+
+/* ── Line Clamp ── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
