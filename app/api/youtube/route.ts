@@ -33,7 +33,7 @@ function parseXML(xml: string): YouTubeChannelData {
 
   // Parse channel URL
   const channelUrlMatch = xml.match(/<uri>([^<]*)<\/uri>/);
-  const channelUrl = channelUrlMatch ? channelUrlMatch[1] : `https://www.youtube.com/channel/${CHANNEL_ID}`;
+  const channelUrl = channelUrlMatch ? channelUrlMatch[1] : 'https://www.youtube.com/@CallMeShazzamTECH';
 
   // Parse entries (videos)
   const entries = xml.split("<entry>").slice(1);
