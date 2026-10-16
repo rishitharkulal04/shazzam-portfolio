@@ -1,10 +1,86 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import type { CollabFormData } from "./api/contact/route";
+import type { YouTubeVideo } from "./api/youtube/route";
 
 /* ─────────────────────────── Sub-components ─────────────────────────── */
+
+/* ── Video Player Modal ── */
+function VideoPlayerModal({ videoId, onClose }: { videoId: string; onClose: () => void }) {
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handleEsc);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.9)", backdropFilter: "blur(12px)" }} />
+
+      {/* Content */}
+      <div
+        className="relative w-full max-w-5xl animate-fadeinup"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-12 right-0 flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold uppercase transition-all cursor-pointer"
+          style={{
+            fontFamily: "var(--font-space-grotesk)",
+            background: "rgba(255,255,255,0.1)",
+            color: "var(--color-on-surface)",
+            border: "1px solid rgba(255,255,255,0.15)",
+          }}
+        >
+          <span className="material-symbols-outlined text-base">close</span>
+          ESC
+        </button>
+
+        {/* YouTube iframe */}
+        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+            title="YouTube video player"
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+
+        {/* Watch on YouTube link */}
+        <div className="mt-3 flex items-center justify-center">
+          <a
+            href={`https://www.youtube.com/watch?v=${videoId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+            style={{
+              fontFamily: "var(--font-space-grotesk)",
+              background: "rgba(255,0,0,0.15)",
+              color: "#FF4444",
+              border: "1px solid rgba(255,0,0,0.3)",
+            }}
+          >
+            <span className="material-symbols-outlined text-sm">smart_display</span>
+            Watch on YouTube
+            <span className="material-symbols-outlined text-sm">open_in_new</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -14,6 +90,8 @@ function NavBar() {
     { id: "overview", label: "The Vibe", href: "#" },
     { id: "bento-series", label: "Bento Series", href: "#bento-series" },
     { id: "the-stream", label: "The Stream", href: "#the-stream" },
+    { id: "youtube-live", label: "YouTube Live", href: "#youtube-live" },
+    { id: "instagram", label: "Instagram", href: "#instagram" },
     { id: "audience-metrics", label: "Audience & Metrics", href: "#audience-metrics" },
     { id: "collab-terminal", label: "Collab Terminal", href: "#collab-terminal" },
   ];
@@ -555,7 +633,7 @@ function BentoSection() {
 }
 
 /* ── The Stream Section ── */
-function StreamSection() {
+function StreamSection({ onPlayVideo }: { onPlayVideo: (videoId: string) => void }) {
   const [activeTab, setActiveTab] = useState("all");
 
   const mediaCards = [
@@ -564,6 +642,7 @@ function StreamSection() {
       category: "breakdowns",
       span: "lg:col-span-2",
       aspect: "aspect-video",
+      youtubeId: "dQw4w9WgXcQ", // placeholder — replace with real video ID
       imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBQtH9_GSKvJO5alXeM9zj7ql2Udi7oAnUHiOQm9a57v7q0Cdq7Zuf0eun1k8BYNLbwG5RDwNZdfJpSFipKfKZUaEBksm0OrHIRe1ajaxddLDwgF78cPICl3W1MdqVtybqkdyMDoRBz6f0Cerorc-txreQg0ce-XHiQrQUkYZkVmlnRM5yr2rZ3gRY-e-2w0KBXXJooyHxN8ggDXayHD1qDFDFwHTlX8CToklK8JFaqlB1doN_dBtO7",
       topBadge: { text: "YOUTUBE 4K", bg: "var(--color-error-container)", color: "var(--color-on-error)" },
       duration: "24:18",
@@ -577,6 +656,7 @@ function StreamSection() {
       category: "comedy",
       span: "",
       aspect: "aspect-[9/16]",
+      instaUrl: "https://instagram.com/callmeshazzam",
       imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuClRs3untmYlkbLNEw3gxlOrSO64LklDSddXdGai5Rqy4EIhYYqPOmQ6Ms6d0DOJyOIna1MD8qS4CYFUPaUERT7G93ESkdKX12CwY4JIKnBm6VAvtsjNRUjGNGxYubOlYFYH_t5Pgaqpr70usMEPcTGA-g3bQADNbzb6h93xOuSlc9NePEflkkXIPivSAU_-TxrcaAENGjOuVlA8gnGJQCHK9LEuCCkXKioIkpnTjNL45Kh_kU4C3Wv",
       topBadge: { text: "VIRAL REEL", bg: "var(--color-secondary-container)", color: "var(--color-on-secondary-container)" },
       bottomText: "When tech companies call a 2W charger \"Eco-Friendly\"",
@@ -588,6 +668,7 @@ function StreamSection() {
       category: "comedy",
       span: "",
       aspect: "aspect-[9/16]",
+      instaUrl: "https://instagram.com/callmeshazzam",
       imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuAmNBgw5F8WfSfegh1KMmnMbkKlW31F18JdmU7hDCAf25tChYvMqSQzGWp8ImUWgAtzlPGRGU7NBoMk1IEjY6FzvqYjyU537OJX8Jmq1ezEPLNmV1Tx10FuT3UlbA4dDSBR1xf7PQXthzGVv-N561Xq8gBt_xZzo4BtOtIZuLWyWhS9tAfO0vdC31gGr6meOdsk6oiP5s-wfE0-SUeWkzez-HCjAOWSYnqvKiYZJaFL4NePwyClXPhg",
       topBadge: { text: "REEL", bg: "var(--color-secondary-container)", color: "var(--color-on-secondary-container)" },
       bottomText: "Buying gadgets in Dubai vs Kochi malls 😂",
@@ -599,6 +680,7 @@ function StreamSection() {
       category: "chai",
       span: "lg:col-span-2",
       aspect: "aspect-video",
+      youtubeId: "dQw4w9WgXcQ", // placeholder — replace with real video ID
       imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBHSFCyPW2nTv1YNYk60aT05Laow4EpLO9PQhOjyQsR7JR1z607_4ahpEMYjQ7GtI6VGM-sLen23b7aIdqrwU2Zvf2_BHD4aGg3gHlMcoswYJtbYuTZK4_PmzLqxMuP7lmlS1_Ab_Vi-p1T5trIoGwNzNuyXkeXs-OSwnv5eT6cWtHoaAUo9ZBNisDmMlrtL8AQum1u64ksg65su7Pwb0B8J2ux4ezVb3Dm6ioxBjfbeWFC0XZ4ciAH",
       topBadge: { text: "PODCAST VOD", bg: "var(--color-surface-container-high)", color: "var(--color-primary)", icon: "podcasts" },
       duration: "38:40",
@@ -619,6 +701,14 @@ function StreamSection() {
   const visibleCards = mediaCards.filter(
     (c) => activeTab === "all" || c.category === activeTab
   );
+
+  const handleCardClick = (card: typeof mediaCards[number]) => {
+    if (card.youtubeId) {
+      onPlayVideo(card.youtubeId);
+    } else if (card.instaUrl) {
+      window.open(card.instaUrl, "_blank");
+    }
+  };
 
   return (
     <section className="relative w-full py-10" id="the-stream">
@@ -660,7 +750,11 @@ function StreamSection() {
         {visibleCards.map((card) => (
           <div
             key={card.id}
-            className={`${card.span || ""} rounded-2xl overflow-hidden group shadow-lg flex flex-col justify-between glass-card glass-card-hover transition-all`}
+            className={`${card.span || ""} rounded-2xl overflow-hidden group shadow-lg flex flex-col justify-between glass-card glass-card-hover transition-all cursor-pointer`}
+            onClick={() => handleCardClick(card)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter") handleCardClick(card); }}
           >
             <div className={`relative w-full ${card.aspect} overflow-hidden`} style={{ background: "var(--color-surface-container-highest)" }}>
               <Image
@@ -700,9 +794,9 @@ function StreamSection() {
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <span
                   className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform"
-                  style={{ background: "var(--color-primary-container)", color: "var(--color-on-primary)" }}
+                  style={{ background: card.isReel ? "var(--color-secondary-container)" : "var(--color-primary-container)", color: card.isReel ? "#fff" : "var(--color-on-primary)" }}
                 >
-                  <span className="material-symbols-outlined text-2xl">play_arrow</span>
+                  <span className="material-symbols-outlined text-2xl">{card.isReel ? "open_in_new" : "play_arrow"}</span>
                 </span>
               </div>
             </div>
@@ -1191,9 +1285,7 @@ function Footer() {
         <div className="flex items-center gap-6" style={{ color: "var(--color-on-surface-variant)" }}>
           {[
             { href: "https://instagram.com/callmeshazzam", icon: "photo_camera", label: "Instagram (2.0M)", hoverColor: "var(--color-secondary)" },
-            { href: "https://youtube.com/@CallMeShazzamTECH", icon: "smart_display", label: "YouTube (2.6M)", hoverColor: "var(--color-primary-container)" },
-            { href: "#", icon: "link", label: "LinkedIn", hoverColor: "var(--color-primary)" },
-            { href: "#", icon: "link", label: "X / Twitter", hoverColor: "var(--color-primary)" },
+            { href: "https://youtube.com/@callmeshazzamtech", icon: "smart_display", label: "YouTube (2.6M)", hoverColor: "var(--color-primary-container)" },
           ].map((s) => (
             <a
               key={s.label}
@@ -1239,15 +1331,624 @@ function Footer() {
   );
 }
 
+/* ── Loading Screen ── */
+function LoadingScreen({ onFinish }: { onFinish: () => void }) {
+  const [exiting, setExiting] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setExiting(true);
+      setTimeout(onFinish, 700); // match exit animation duration
+    }, 3200);
+    return () => clearTimeout(timer);
+  }, [onFinish]);
+
+  const particles = [
+    { top: "15%", left: "10%", delay: "0s", size: 4 },
+    { top: "25%", right: "15%", delay: "0.5s", size: 3 },
+    { top: "70%", left: "20%", delay: "1s", size: 5 },
+    { top: "60%", right: "10%", delay: "1.5s", size: 3 },
+    { top: "80%", left: "50%", delay: "0.8s", size: 4 },
+    { top: "40%", left: "80%", delay: "1.2s", size: 3 },
+  ];
+
+  return (
+    <div className={`loading-screen ${exiting ? "exit" : ""}`}>
+      {/* Scanline Effect */}
+      <div className="loader-scanline" />
+
+      {/* Ambient Glow */}
+      <div
+        className="pointer-events-none absolute w-[600px] h-[600px] -z-10"
+        style={{
+          background: "radial-gradient(ellipse at center, rgba(0,255,102,0.08), rgba(110,0,190,0.04) 50%, transparent 80%)",
+          filter: "blur(80px)",
+        }}
+      />
+
+      {/* Floating Particles */}
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="loader-particle"
+          style={{
+            top: p.top,
+            left: p.left,
+            right: p.right,
+            width: p.size,
+            height: p.size,
+            animationDelay: p.delay,
+          } as React.CSSProperties}
+        />
+      ))}
+
+      {/* Logo */}
+      <div
+        className="loader-logo w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
+        style={{
+          background: "var(--color-primary-container)",
+          color: "var(--color-on-primary)",
+          boxShadow: "0 0 40px rgba(0,255,102,0.4), 0 0 80px rgba(0,255,102,0.15)",
+        }}
+      >
+        <span
+          className="text-3xl font-bold"
+          style={{ fontFamily: "var(--font-space-grotesk)" }}
+        >
+          SZ
+        </span>
+      </div>
+
+      {/* Title */}
+      <h1
+        className="loader-title text-3xl sm:text-4xl font-bold uppercase tracking-widest mb-2"
+        style={{
+          fontFamily: "var(--font-space-grotesk)",
+          color: "var(--color-on-surface)",
+        }}
+      >
+        SHAZZAM
+      </h1>
+
+      {/* Tagline */}
+      <p
+        className="loader-tagline text-xs font-bold uppercase tracking-widest"
+        style={{
+          fontFamily: "var(--font-space-grotesk)",
+          color: "var(--color-primary-container)",
+        }}
+      >
+        TEA × TECH × SARCASM — INITIALIZING
+      </p>
+
+      {/* Progress Bar */}
+      <div className="loader-bar-track">
+        <div className="loader-bar-fill" />
+      </div>
+
+      {/* Status text */}
+      <p
+        className="loader-tagline mt-4 text-xs uppercase tracking-wider"
+        style={{
+          fontFamily: "var(--font-space-grotesk)",
+          color: "var(--color-outline)",
+          animationDelay: "1.5s",
+        }}
+      >
+        Loading Media Kit...
+      </p>
+    </div>
+  );
+}
+
+/* ── YouTube Live Section (Real Data) ── */
+function YouTubeLiveSection({ onPlayVideo }: { onPlayVideo: (videoId: string) => void }) {
+  const [videos, setVideos] = useState<YouTubeVideo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [channelTitle, setChannelTitle] = useState("CallMeShazzamTECH");
+
+  useEffect(() => {
+    async function fetchVideos() {
+      try {
+        const res = await fetch("/api/youtube");
+        const json = await res.json();
+        if (json.success && json.data) {
+          setVideos(json.data.videos);
+          setChannelTitle(json.data.channelTitle);
+        } else {
+          setError(true);
+        }
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchVideos();
+  }, []);
+
+  function formatViews(count?: string): string {
+    if (!count) return "";
+    const n = parseInt(count, 10);
+    if (isNaN(n)) return count;
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M views`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K views`;
+    return `${n} views`;
+  }
+
+  function timeAgo(dateStr: string): string {
+    const now = Date.now();
+    const past = new Date(dateStr).getTime();
+    const diff = now - past;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (days < 1) return "Today";
+    if (days === 1) return "1 day ago";
+    if (days < 7) return `${days} days ago`;
+    const weeks = Math.floor(days / 7);
+    if (days < 30) return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
+    const months = Math.floor(days / 30);
+    if (days < 365) return `${months} ${months === 1 ? "month" : "months"} ago`;
+    const years = Math.floor(days / 365);
+    return `${years} ${years === 1 ? "year" : "years"} ago`;
+  }
+
+  // Skeleton loader
+  if (loading) {
+    return (
+      <section className="relative w-full py-10" id="youtube-live">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#FF0000" }} />
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-space-grotesk)", color: "#FF0000", letterSpacing: "0.1em" }}>
+              YOUTUBE LIVE // LATEST UPLOADS
+            </span>
+          </div>
+          <h2 className="text-3xl lg:text-4xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)", letterSpacing: "-0.02em" }}>
+            Fresh From The Channel
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="yt-video-card">
+              <div className="yt-skeleton aspect-video" />
+              <div className="p-4 space-y-2">
+                <div className="yt-skeleton h-4 w-full" />
+                <div className="yt-skeleton h-4 w-3/4" />
+                <div className="yt-skeleton h-3 w-1/2 mt-2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error || videos.length === 0) {
+    return (
+      <section className="relative w-full py-10" id="youtube-live">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#FF0000" }} />
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-space-grotesk)", color: "#FF0000", letterSpacing: "0.1em" }}>
+              YOUTUBE LIVE // LATEST UPLOADS
+            </span>
+          </div>
+          <h2 className="text-3xl lg:text-4xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)", letterSpacing: "-0.02em" }}>
+            Fresh From The Channel
+          </h2>
+        </div>
+        <div className="p-8 rounded-2xl text-center glass-card">
+          <span className="material-symbols-outlined text-4xl mb-3 block" style={{ color: "#FF0000" }}>smart_display</span>
+          <p className="text-lg font-semibold mb-2" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)" }}>
+            Could not load live YouTube data
+          </p>
+          <p className="text-sm" style={{ color: "var(--color-on-surface-variant)" }}>
+            Visit the channel directly for the latest content
+          </p>
+          <a
+            href="https://youtube.com/@callmeshazzamtech"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-lg text-sm font-bold uppercase"
+            style={{ background: "#FF0000", color: "#fff", fontFamily: "var(--font-space-grotesk)" }}
+          >
+            <span className="material-symbols-outlined text-base">open_in_new</span>
+            Open YouTube Channel
+          </a>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="relative w-full py-10" id="youtube-live">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-3">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#FF0000" }} />
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-space-grotesk)", color: "#FF0000", letterSpacing: "0.1em" }}>
+              YOUTUBE LIVE // LATEST UPLOADS
+            </span>
+          </div>
+          <h2 className="text-3xl lg:text-4xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)", letterSpacing: "-0.02em" }}>
+            Fresh From {channelTitle}
+          </h2>
+        </div>
+        <a
+          href="https://youtube.com/@callmeshazzamtech"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+          style={{
+            fontFamily: "var(--font-space-grotesk)",
+            background: "rgba(255,0,0,0.15)",
+            color: "#FF4444",
+            border: "1px solid rgba(255,0,0,0.3)",
+            letterSpacing: "0.06em",
+          }}
+        >
+          <span className="material-symbols-outlined text-sm">smart_display</span>
+          Subscribe on YouTube
+          <span className="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </div>
+
+      {/* Video Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {videos.slice(0, 6).map((video) => (
+          <div
+            key={video.id}
+            className="yt-video-card group block cursor-pointer"
+            onClick={() => onPlayVideo(video.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter") onPlayVideo(video.id); }}
+          >
+            {/* Thumbnail */}
+            <div className="relative aspect-video overflow-hidden" style={{ background: "var(--color-surface-container-highest)" }}>
+              <Image
+                src={video.thumbnail}
+                alt={video.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                unoptimized
+              />
+              {/* Hover Play Overlay */}
+              <div className="yt-thumb-overlay absolute inset-0 flex items-center justify-center bg-black/30">
+                <span
+                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ background: "#FF0000", color: "#fff" }}
+                >
+                  <span className="material-symbols-outlined text-3xl">play_arrow</span>
+                </span>
+              </div>
+              {/* YouTube Badge */}
+              <div
+                className="absolute top-2.5 left-2.5 px-2 py-1 rounded flex items-center gap-1 text-xs font-bold uppercase"
+                style={{ background: "#FF0000", color: "#fff", fontFamily: "var(--font-space-grotesk)" }}
+              >
+                <span className="material-symbols-outlined text-xs">smart_display</span>
+                YouTube
+              </div>
+              {/* View Count */}
+              {video.viewCount && (
+                <div
+                  className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded text-xs font-semibold"
+                  style={{ background: "rgba(14,14,16,0.85)", color: "var(--color-on-surface)" }}
+                >
+                  {formatViews(video.viewCount)}
+                </div>
+              )}
+            </div>
+
+            {/* Info */}
+            <div className="p-4">
+              <h3
+                className="text-sm font-semibold leading-snug line-clamp-2 mb-2 transition-colors group-hover:text-white"
+                style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)" }}
+              >
+                {video.title}
+              </h3>
+              <div className="flex items-center gap-2 text-xs" style={{ color: "var(--color-outline)" }}>
+                <span>{timeAgo(video.published)}</span>
+                {video.viewCount && (
+                  <>
+                    <span>·</span>
+                    <span style={{ color: "#FF4444", fontWeight: 600 }}>{formatViews(video.viewCount)}</span>
+                  </>
+                )}
+              </div>
+              {video.description && (
+                <p className="text-xs leading-5 mt-2 line-clamp-2" style={{ color: "var(--color-on-surface-variant)" }}>
+                  {video.description}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Show More Link */}
+      {videos.length > 6 && (
+        <div className="mt-6 text-center">
+          <a
+            href="https://youtube.com/@callmeshazzamtech"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all glass-card glass-card-hover"
+            style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)", letterSpacing: "0.06em" }}
+          >
+            <span className="material-symbols-outlined text-base" style={{ color: "#FF0000" }}>smart_display</span>
+            View All Videos on YouTube
+            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+          </a>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ── Instagram Section ── */
+function InstagramSection() {
+  const highlights = [
+    { title: "Tech Roasts", views: "12M+ Views", icon: "devices", color: "var(--color-primary-container)" },
+    { title: "Dubai Diaries", views: "8M+ Views", icon: "flight", color: "var(--color-secondary)" },
+    { title: "Unboxings", views: "15M+ Views", icon: "inventory_2", color: "var(--color-primary-fixed)" },
+    { title: "Life of Shazzam", views: "10M+ Views", icon: "theater_comedy", color: "var(--color-tertiary)" },
+  ];
+
+  const reelStats = [
+    { label: "Average Reel Views", value: "2.5M+", icon: "visibility" },
+    { label: "Reel Completion Rate", value: "88%", icon: "check_circle" },
+    { label: "Avg. Likes per Reel", value: "350K+", icon: "favorite" },
+    { label: "Comment Engagement", value: "Top 1%", icon: "chat_bubble" },
+  ];
+
+  return (
+    <section className="relative w-full py-10" id="instagram">
+      {/* Ambient Glow */}
+      <div
+        className="pointer-events-none absolute -top-20 right-0 w-[500px] h-[500px] -z-10"
+        style={{
+          background: "radial-gradient(ellipse at center, rgba(225,48,108,0.08), rgba(131,58,180,0.04) 50%, transparent 80%)",
+          filter: "blur(80px)",
+        }}
+      />
+
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-3">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#E1306C" }} />
+            <span className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-space-grotesk)", color: "#E1306C", letterSpacing: "0.1em" }}>
+              INSTAGRAM // @CALLMESHAZZAM
+            </span>
+          </div>
+          <h2 className="text-3xl lg:text-4xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)", letterSpacing: "-0.02em" }}>
+            2M+ Followers · Viral Reels Machine
+          </h2>
+        </div>
+        <a
+          href="https://instagram.com/callmeshazzam"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+          style={{
+            fontFamily: "var(--font-space-grotesk)",
+            background: "linear-gradient(135deg, #833AB4, #E1306C, #F77737)",
+            color: "#fff",
+            letterSpacing: "0.06em",
+            boxShadow: "0 4px 20px rgba(225,48,108,0.3)",
+          }}
+        >
+          <span className="material-symbols-outlined text-sm">photo_camera</span>
+          Follow @callmeshazzam
+          <span className="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Profile Card */}
+        <div className="lg:col-span-5 p-6 rounded-2xl glass-card relative overflow-hidden">
+          <div
+            className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(225,48,108,0.1), transparent 70%)", filter: "blur(40px)" }}
+          />
+          <div className="flex items-center gap-4 mb-5">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold"
+              style={{
+                background: "linear-gradient(135deg, #833AB4, #E1306C, #F77737)",
+                color: "#fff",
+                fontFamily: "var(--font-space-grotesk)",
+                boxShadow: "0 0 20px rgba(225,48,108,0.4)",
+              }}
+            >
+              SZ
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)" }}>
+                  @callmeshazzam
+                </h3>
+                <span className="material-symbols-outlined text-base" style={{ color: "#3897F0" }}>verified</span>
+              </div>
+              <p className="text-sm mt-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Shaz Mohamed · Tech Creator</p>
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            {[
+              { label: "Followers", value: "2.0M" },
+              { label: "Posts", value: "1.2K+" },
+              { label: "Avg Reach", value: "4.5M" },
+            ].map((s) => (
+              <div key={s.label} className="text-center p-3 rounded-xl" style={{ background: "rgba(42,42,44,0.5)" }}>
+                <p className="stat-num text-2xl" style={{ color: "var(--color-on-surface)" }}>{s.value}</p>
+                <span className="text-xs font-bold uppercase" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-outline)" }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Bio */}
+          <div className="p-4 rounded-xl" style={{ background: "rgba(42,42,44,0.4)" }}>
+            <p className="text-sm leading-6" style={{ color: "var(--color-on-surface-variant)" }}>
+              🇮🇳🇦🇪 Tech Critic · TEDx Speaker · Zero Sugarcoating since 2018
+              <br />📱 Honest reviews that save you money
+              <br />😂 Comedy that makes tech fun
+              <br />☕ CHAi with Tech — every week
+            </p>
+          </div>
+
+          {/* CTA */}
+          <a
+            href="https://instagram.com/callmeshazzam"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all"
+            style={{
+              fontFamily: "var(--font-space-grotesk)",
+              background: "rgba(225,48,108,0.15)",
+              color: "#E1306C",
+              border: "1px solid rgba(225,48,108,0.3)",
+              letterSpacing: "0.06em",
+            }}
+          >
+            <span className="material-symbols-outlined text-sm">photo_camera</span>
+            View Instagram Profile
+            <span className="material-symbols-outlined text-sm">open_in_new</span>
+          </a>
+        </div>
+
+        {/* Right Column */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
+          {/* Reel Performance Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {reelStats.map((stat) => (
+              <div key={stat.label} className="p-4 rounded-xl glass-card glass-card-hover transition-all text-center">
+                <span className="material-symbols-outlined text-2xl mb-2 block" style={{ color: "#E1306C" }}>{stat.icon}</span>
+                <p className="stat-num text-2xl mb-1" style={{ color: "var(--color-on-surface)" }}>{stat.value}</p>
+                <span className="text-xs font-bold uppercase" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-outline)", letterSpacing: "0.04em" }}>
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Content Highlights */}
+          <div className="p-5 rounded-2xl glass-card">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-base" style={{ color: "#E1306C" }}>auto_awesome</span>
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-space-grotesk)", color: "#E1306C", letterSpacing: "0.1em" }}>
+                CONTENT HIGHLIGHTS
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {highlights.map((h) => (
+                <a
+                  key={h.title}
+                  href="https://instagram.com/callmeshazzam"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-xl text-center transition-all group"
+                  style={{ background: "rgba(42,42,44,0.4)" }}
+                >
+                  <span className="material-symbols-outlined text-3xl mb-2 block transition-transform group-hover:scale-110" style={{ color: h.color }}>{h.icon}</span>
+                  <p className="text-sm font-bold mb-0.5" style={{ fontFamily: "var(--font-space-grotesk)", color: "var(--color-on-surface)" }}>{h.title}</p>
+                  <span className="text-xs font-semibold" style={{ color: "#E1306C" }}>{h.views}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Viral Reel Showcase */}
+          <div className="p-5 rounded-2xl glass-card">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-base" style={{ color: "#F77737" }}>local_fire_department</span>
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ fontFamily: "var(--font-space-grotesk)", color: "#F77737", letterSpacing: "0.1em" }}>
+                  TOP VIRAL REELS
+                </span>
+              </div>
+              <a
+                href="https://instagram.com/callmeshazzam/reels/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold uppercase flex items-center gap-1"
+                style={{ fontFamily: "var(--font-space-grotesk)", color: "#E1306C" }}
+              >
+                See All <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </a>
+            </div>
+            <div className="space-y-2">
+              {[
+                { title: "When tech companies call a 2W charger \"Eco-Friendly\" 😂", views: "3.8M", likes: "420K" },
+                { title: "Buying gadgets in Dubai vs Kochi malls 🛒", views: "2.1M", likes: "290K" },
+                { title: "POV: You bought a phone for the camera but the battery dies first 📱", views: "4.2M", likes: "510K" },
+                { title: "Indian parents reacting to your phone EMI 💀", views: "5.1M", likes: "680K" },
+              ].map((reel) => (
+                <a
+                  key={reel.title}
+                  href="https://instagram.com/callmeshazzam"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 rounded-xl transition-all group"
+                  style={{ background: "rgba(42,42,44,0.3)" }}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span
+                      className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: "linear-gradient(135deg, #833AB4, #E1306C)", color: "#fff" }}
+                    >
+                      <span className="material-symbols-outlined text-lg">play_arrow</span>
+                    </span>
+                    <p className="text-sm font-medium truncate" style={{ color: "var(--color-on-surface)" }}>{reel.title}</p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0 ml-3">
+                    <span className="text-xs font-bold" style={{ fontFamily: "var(--font-space-grotesk)", color: "#E1306C" }}>{reel.views} views</span>
+                    <span className="text-xs" style={{ color: "var(--color-outline)" }}>♥ {reel.likes}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─────────────────────────── Main Page ─────────────────────────── */
 export default function HomePage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+
+  const handleLoadingFinish = useCallback(() => {
+    setIsLoading(false);
+  }, []);
+
+  const handlePlayVideo = useCallback((videoId: string) => {
+    setPlayingVideoId(videoId);
+  }, []);
+
+  const handleCloseVideo = useCallback(() => {
+    setPlayingVideoId(null);
+  }, []);
+
   return (
     <>
+      {isLoading && <LoadingScreen onFinish={handleLoadingFinish} />}
+      {playingVideoId && <VideoPlayerModal videoId={playingVideoId} onClose={handleCloseVideo} />}
       <NavBar />
       <main className="w-full max-w-7xl mx-auto px-4 lg:px-12 pt-20 pb-12">
         <HeroSection />
         <BentoSection />
-        <StreamSection />
+        <StreamSection onPlayVideo={handlePlayVideo} />
+        <YouTubeLiveSection onPlayVideo={handlePlayVideo} />
+        <InstagramSection />
         <AudienceSection />
         <WhyWorkSection />
         <CollabTerminal />

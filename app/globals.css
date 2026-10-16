@@ -273,3 +273,167 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* =============================================
+   LOADING SCREEN
+   ============================================= */
+
+@keyframes loader-logo-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes loader-text-reveal {
+  0%   { opacity: 0; transform: translateY(16px); letter-spacing: 0.4em; }
+  60%  { opacity: 1; transform: translateY(0); letter-spacing: 0.3em; }
+  100% { opacity: 1; transform: translateY(0); letter-spacing: 0.2em; }
+}
+
+@keyframes loader-bar-fill {
+  0%   { width: 0%; }
+  20%  { width: 25%; }
+  50%  { width: 60%; }
+  80%  { width: 85%; }
+  100% { width: 100%; }
+}
+
+@keyframes loader-tagline-fade {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 0.6; transform: translateY(0); }
+}
+
+@keyframes loader-exit {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.04); pointer-events: none; }
+}
+
+@keyframes loader-scanline {
+  0%   { top: -10%; }
+  100% { top: 110%; }
+}
+
+@keyframes loader-glitch {
+  0%, 93%, 100% { transform: none; }
+  94%           { transform: translate(-2px, 1px); }
+  95%           { transform: translate(2px, -1px); }
+  96%           { transform: translate(-1px, 2px); }
+}
+
+@keyframes loader-particle-float {
+  0%   { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%  { transform: translateY(-20px) scale(1.3); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 0.6; }
+}
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.loading-screen.exit {
+  animation: loader-exit 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.loading-screen .loader-scanline {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 102, 0.15), transparent);
+  animation: loader-scanline 2.5s linear infinite;
+  pointer-events: none;
+}
+
+.loading-screen .loader-logo {
+  animation: loader-logo-pulse 2s ease-in-out infinite, loader-glitch 3s linear infinite;
+}
+
+.loading-screen .loader-title {
+  animation: loader-text-reveal 1.2s ease forwards;
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.loading-screen .loader-tagline {
+  animation: loader-tagline-fade 0.8s ease forwards;
+  animation-delay: 1s;
+  opacity: 0;
+}
+
+.loading-screen .loader-bar-track {
+  width: 200px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--color-surface-container-highest);
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+.loading-screen .loader-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary-container), var(--color-secondary));
+  animation: loader-bar-fill 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.loading-screen .loader-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-primary-container);
+  opacity: 0.5;
+  animation: loader-particle-float 3s ease-in-out infinite;
+}
+
+/* =============================================
+   YOUTUBE LIVE SECTION
+   ============================================= */
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.yt-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container-low) 25%,
+    var(--color-surface-container-high) 50%,
+    var(--color-surface-container-low) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+.yt-video-card {
+  background: rgba(18, 18, 24, 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yt-video-card:hover {
+  border-color: rgba(255, 0, 0, 0.4);
+  box-shadow: 0 8px 32px -8px rgba(255, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+.yt-video-card .yt-thumb-overlay {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.yt-video-card:hover .yt-thumb-overlay {
+  opacity: 1;
+}
